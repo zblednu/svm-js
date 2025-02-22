@@ -1,21 +1,4 @@
-import { dotProd } from "utils.js";
-
-const dataset = [
-  { x: 1, y: 2, label: 1 },  // Positive class
-  { x: 2, y: 3, label: 1 },
-  { x: 3, y: 1, label: 1 },
-  { x: 4, y: 4, label: 1 },
-  { x: 5, y: 2, label: 1 },
-  
-  { x: 6, y: 5, label: -1 }, // Negative class
-  { x: 7, y: 6, label: -1 },
-  { x: 8, y: 7, label: -1 },
-  { x: 9, y: 5, label: -1 },
-  { x: 10, y: 6, label: -1 }
-];
-
-const samples = dataset.map(elem => [elem.x, elem.y]);
-const labels = dataset.map(elem => elem.label);
+import { dotProd } from "./utils.js";
 
 function SVM(learnRate = 0.001, lambda = 0.01, iters = 1000) {
 
@@ -31,16 +14,26 @@ SVM.prototype.fit = function(samples, labels) {
 	const samplesAmt = samples.length;
 	const featureAmt = samples[0].length;
 
-	// init bias and weights as zeros,
 	this.weights = new Array(featureAmt).fill(0);
 	this.bias = 0;
 
 	for (let i = 0; i < this.iters; ++i) {
-		samples.forEach((elem, idx) => {
-			const condition = labels[idx] * (dotProd(elem, this.weights) - this.bias) >= 1;
+
+		samples.forEach((sample, idx) => {
+
+			const condition = labels[idx] * (dotProd(sample, this.weights) - this.bias) >= 1;
+
 			if (condition) {
-				this.
+
+				this.weights.forEach((_, i) => {
+					this.weights[i] -= this.learnRate * (2 * this.lambda * this.weights[i]);
+				}, this);
+
 			} else {
+
+				this.weights.forEach((_, i) => {
+					this.weights[i]-= this.learnRate * (2 * this.lambda * this.weights[i] - (sample[i] * labels[idx]));
+				}, this);
 				this.bias -= this.learnRate * labels[idx];
 			}
 		})
@@ -53,4 +46,11 @@ SVM.prototype.predict = function(sample) {
 }
 
 const svm = new SVM();
-svm.fit(samples, labels);
+const dataset = {
+	"samples":[[1,2],[2,3],[3,1],[4,4],[5,2],[6,5],[7,6],[8,7],[9,5],[10,6]],
+	"labels":[1,1,1,1,1,-1,-1,-1,-1,-1] //MUST be either 1 or -1, if 0 algo is fucked
+}
+
+svm.fit(dataset.samples, dataset.labels);
+console.log(svm.predict([process.argv[2], process.argv[3]]));
+
