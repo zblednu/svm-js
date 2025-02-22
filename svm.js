@@ -25,19 +25,14 @@ function SVM(learnRate = 0.001, lambda = 0.01, iters = 1000) {
 
 	this.weights = null;
 	this.bias = null;
-
-
 }
 
 SVM.prototype.fit = function(samples, labels) {
 	const samplesAmt = samples.length;
 	const featureAmt = samples[0].length;
 
-	// init weight with zeros
+	// init bias and weights as zeros,
 	this.weights = new Array(featureAmt).fill(0);
-	// convert labels so that 0 becomes -1
-	//labels = labels.map(elem => elem === 0 ? -1 : 1);
-
 	this.bias = 0;
 
 	for (let i = 0; i < this.iters; ++i) {
