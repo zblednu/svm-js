@@ -1,53 +1,61 @@
-import np from "numjs";
-import fs from "node:fs";
+import { dotProd } from "utils.js";
 
-class SVM {
-	constructor(learningRate = 0.001, lambda = 0.01, iters = 1000) {
-		this.lr = learningRate;
-		this.lambda = lambda;
-		this.iters = iters;
+const dataset = [
+  { x: 1, y: 2, label: 1 },  // Positive class
+  { x: 2, y: 3, label: 1 },
+  { x: 3, y: 1, label: 1 },
+  { x: 4, y: 4, label: 1 },
+  { x: 5, y: 2, label: 1 },
+  
+  { x: 6, y: 5, label: -1 }, // Negative class
+  { x: 7, y: 6, label: -1 },
+  { x: 8, y: 7, label: -1 },
+  { x: 9, y: 5, label: -1 },
+  { x: 10, y: 6, label: -1 }
+];
 
-		this.w = null;
-		this.b = null;
-	}
+const samples = dataset.map(elem => [elem.x, elem.y]);
+const labels = dataset.map(elem => elem.label);
+
+function SVM(learnRate = 0.001, lambda = 0.01, iters = 1000) {
+
+	this.learnRate = learnRate;
+	this.lambda = lambda;
+	this.iters = iters;
+
+	this.weights = null;
+	this.bias = null;
 
 
-	/*
-	 y must be either 1 or -1
-	 */
-	fit(X, y) {
-		const shape = X.shape;
-		const nSamples = shape[0];
-		const nFeatures = shape[1];
+}
 
-		this.w = np.zeros(nFeatures);
-		this.b = 0;
+SVM.prototype.fit = function(samples, labels) {
+	const samplesAmt = samples.length;
+	const featureAmt = samples[0].length;
 
-		for (let i = 0; i < this.iters; ++i) {
-			for (let j = 0; j < X.shape[0]; ++j) {
-				const elem = X.get(j);
-				const idx = j;
-				const condition = y[idx] * (np.dot(elem, this.w) - this.b) >= 1;
-				if (condition) {
-					this.w -= this.lr * (2 * this.lambda * this.w);
-				} else {
-					this.w -= this.lr * (2 * this.lambda * this.w - np.dot(elem, y[idx]));
-					this.b -= this.lr * y[idx];
-				}
+	// init weight with zeros
+	this.weights = new Array(featureAmt).fill(0);
+	// convert labels so that 0 becomes -1
+	//labels = labels.map(elem => elem === 0 ? -1 : 1);
+
+	this.bias = 0;
+
+	for (let i = 0; i < this.iters; ++i) {
+		samples.forEach((elem, idx) => {
+			const condition = labels[idx] * (dotProd(elem, this.weights) - this.bias) >= 1;
+			if (condition) {
+				this.
+			} else {
+				this.bias -= this.learnRate * labels[idx];
 			}
-		}
-	}
-
-	predict(X) {
+		})
 	}
 }
 
-const X = np.array(JSON.parse(fs.readFileSync("input-data")));
-const y = np.array(JSON.parse(fs.readFileSync("input-labels")));
-
-console.log(X);
-console.log(X.get(0, 0));
-
+SVM.prototype.predict = function(sample) {
+	const approximation = dotProd(sample, this.weights) - this.bias;
+	return Math.sign(approximation);
+}
 
 const svm = new SVM();
-svm.fit(X, y);
+svm.fit(samples, labels);
