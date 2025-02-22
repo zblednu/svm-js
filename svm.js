@@ -27,13 +27,13 @@ SVM.prototype.fit = function(samples, labels) {
 
 				this.weights.forEach((_, i) => {
 					this.weights[i] -= this.learnRate * (2 * this.lambda * this.weights[i]);
-				}, this);
+				});
 
 			} else {
 
 				this.weights.forEach((_, i) => {
 					this.weights[i]-= this.learnRate * (2 * this.lambda * this.weights[i] - (sample[i] * labels[idx]));
-				}, this);
+				});
 				this.bias -= this.learnRate * labels[idx];
 			}
 		})
